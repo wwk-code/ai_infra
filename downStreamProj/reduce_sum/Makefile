@@ -1,11 +1,12 @@
 ################################################################# For Debug  #################################################################
 
 BINARY_NAME = app
-CUDA_PATH   = /usr/local/cuda-12.4
+# CUDA_PATH   = /usr/local/cuda-12.6
+CUDA_PATH   = /usr/local/cuda
 CC          = $(CUDA_PATH)/bin/nvcc
 
-# 调试编译选项
-CFLAGS      = -O0 -g -G -Xcompiler -rdynamic -DUSE_MULTI_GPU
+# 调试编译选项 - 禁用device-link优化
+CFLAGS      = -O0 -g -G -Xcompiler -rdynamic -DUSE_MULTI_GPU -rdc=true
 PTXASFLAGS  = -Xptxas -O0,-v
 FASTMATH    = 
 ARCHFLAGS   = -gencode arch=compute_80,code=sm_80
@@ -20,7 +21,7 @@ all: outputs/$(BINARY_NAME)
 
 outputs/$(BINARY_NAME): $(OBJ)
 	@mkdir -p outputs
-	$(CC) $(CFLAGS) $(PTXASFLAGS) $(FASTMATH) $(ARCHFLAGS) $(LDFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(ARCHFLAGS) $(LDFLAGS) $^ -o $@
 
 build/%.o: csrc/%.cu
 	@mkdir -p build
@@ -33,7 +34,8 @@ clean:
 ################################################################# For optimal performance  #################################################################
 
 # BINARY_NAME = app
-# CUDA_PATH   = /usr/local/cuda-12.4
+# # CUDA_PATH   = /usr/local/cuda-12.4
+# CUDA_PATH   = /usr/local/cuda-12.6
 # CC          = $(CUDA_PATH)/bin/nvcc
 
 # # 编译选项

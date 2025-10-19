@@ -1,5 +1,48 @@
 #include "common.cuh"
 
+// 简单的CPU矩阵乘法实现
+void cpu_sgemm(int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            FLOAT sum = 0.0f;
+            for (int p = 0; p < k; p++) {
+                sum += A[i + p * m] * B[p + j * k];
+            }
+            C[i + j * m] = alpha * sum + beta * C[i + j * m];
+        }
+    }
+}
+
+// GPU矩阵乘法kernel（简单实现）
+__global__ void gpu_sgemm_kernel(int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C);
+// __global__ void gpu_sgemm_kernel(int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C) {
+//     int idx = blockIdx.x * blockDim.x + threadIdx.x;
+//     int total = m * n;
+    
+//     if (idx < total) {
+//         int i = idx % m;
+//         int j = idx / m;
+//         FLOAT sum = 0.0f;
+//         for (int p = 0; p < k; p++) {
+//             sum += A[i + p * m] * B[p + j * k];
+//         }
+//         C[idx] = alpha * sum + beta * C[idx];
+//     }
+// }
+
+// 测试kernel调度函数
+void test_kernel(int kernel_id, int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C, cublasHandle_t handle) {
+    if (kernel_id == 0) {
+        // CPU实现
+        cpu_sgemm(m, k, n, alpha, A, B, beta, C);
+    } else {
+        // GPU实现
+        int total = m * n;
+        int threads = 256;
+        int blocks = (total + threads - 1) / threads;
+        gpu_sgemm_kernel<<<blocks, threads>>>(m, k, n, alpha, A, B, beta, C);
+    }
+}
 
 __global__ void reduce_sum_kernel(const DTYPE *g_idata, DTYPE *g_odata, int n) {
     const int tid_in_block = threadIdx.x;
@@ -95,10 +138,11 @@ void host_reduce_sum(const DTYPE *h_idata, DTYPE *h_odata, int n_elements) {
     int num_blocks_2 = CEIL_DIV(n_elements_partial, threads_per_block);
     
     // 分配最终结果的设备内存（只需要一个元素）
+    cudaMalloc(&d_odata_final, sizeof(DTYPE));
     cudaMemset(d_odata_final, 0, sizeof(DTYPE));
     
     // 启动第二个 Kernel
-    final_reduce_kernel<<<num_blocks_2, threads_per_block>>>(d_odata_partial, d_odata_final, n_elements_partial);
+    final_reduce_kernel_fixed<<<num_blocks_2, threads_per_block>>>(d_odata_partial, d_odata_final, n_elements_partial);
     cudaDeviceSynchronize();
     
     // 将最终结果从设备端拷贝回主机端

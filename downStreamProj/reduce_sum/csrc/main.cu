@@ -1,5 +1,20 @@
 #include "reduce_sum.cuh"
 
+__global__ void gpu_sgemm_kernel(int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int total = m * n;
+    
+    if (idx < total) {
+        int i = idx % m;
+        int j = idx / m;
+        FLOAT sum = 0.0f;
+        for (int p = 0; p < k; p++) {
+            sum += A[i + p * m] * B[p + j * k];
+        }
+        C[idx] = alpha * sum + beta * C[idx];
+    }
+}
+
 #define CUBLAS_CHECK(err) \
     if((err) != CUBLAS_STATUS_SUCCESS) { \
         fprintf(stderr, "cuBLAS error %d at %s:%d\n", err, __FILE__, __LINE__); \
@@ -130,7 +145,7 @@ int main(int argc, char **argv) {
     cudaFree(dA);
     cudaFree(dB);
     cudaFree(dC);
-    cudaFree(dC_ref);
+    // cudaFree(dC_ref);  // dC_ref未使用，注释掉
     cudaDeviceSynchronize();
 
     return 0;
