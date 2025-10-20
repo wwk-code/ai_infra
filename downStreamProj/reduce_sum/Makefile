@@ -2,7 +2,7 @@
 
 BINARY_NAME = app
 # CUDA_PATH   = /usr/local/cuda-12.6
-CUDA_PATH   = /usr/local/cuda
+CUDA_PATH   = /usr/local/cuda-12.4
 CC          = $(CUDA_PATH)/bin/nvcc
 
 # 调试编译选项 - 禁用device-link优化

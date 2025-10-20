@@ -8,7 +8,7 @@ CC          = $(CUDA_PATH)/bin/nvcc
 CFLAGS      = -O0 -g -G -Xcompiler -rdynamic -DUSE_MULTI_GPU
 PTXASFLAGS  = -Xptxas -O0,-v
 FASTMATH    = 
-ARCHFLAGS   = -gencode arch=compute_80,code=sm_80
+ARCHFLAGS   = -gencode arch=compute_86,code=sm_86
 
 INCFLAGS    = -I$(CUDA_PATH)/include -I../../common/csrc/include -Icsrc/include -Icuda-samples/Common
 LDFLAGS     = -L$(CUDA_PATH)/lib64 -lcudart -lcublas -lcublasLt -lcurand

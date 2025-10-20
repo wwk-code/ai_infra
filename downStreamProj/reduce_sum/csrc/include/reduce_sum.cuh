@@ -1,49 +1,5 @@
 #include "common.cuh"
 
-// 简单的CPU矩阵乘法实现
-void cpu_sgemm(int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C) {
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            FLOAT sum = 0.0f;
-            for (int p = 0; p < k; p++) {
-                sum += A[i + p * m] * B[p + j * k];
-            }
-            C[i + j * m] = alpha * sum + beta * C[i + j * m];
-        }
-    }
-}
-
-// GPU矩阵乘法kernel（简单实现）
-__global__ void gpu_sgemm_kernel(int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C);
-// __global__ void gpu_sgemm_kernel(int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C) {
-//     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-//     int total = m * n;
-    
-//     if (idx < total) {
-//         int i = idx % m;
-//         int j = idx / m;
-//         FLOAT sum = 0.0f;
-//         for (int p = 0; p < k; p++) {
-//             sum += A[i + p * m] * B[p + j * k];
-//         }
-//         C[idx] = alpha * sum + beta * C[idx];
-//     }
-// }
-
-// 测试kernel调度函数
-void test_kernel(int kernel_id, int m, int k, int n, FLOAT alpha, const DTYPE* A, const DTYPE* B, FLOAT beta, DTYPE* C, cublasHandle_t handle) {
-    if (kernel_id == 0) {
-        // CPU实现
-        cpu_sgemm(m, k, n, alpha, A, B, beta, C);
-    } else {
-        // GPU实现
-        int total = m * n;
-        int threads = 256;
-        int blocks = (total + threads - 1) / threads;
-        gpu_sgemm_kernel<<<blocks, threads>>>(m, k, n, alpha, A, B, beta, C);
-    }
-}
-
 __global__ void reduce_sum_kernel(const DTYPE *g_idata, DTYPE *g_odata, int n) {
     const int tid_in_block = threadIdx.x;
     const int block_size = blockDim.x;

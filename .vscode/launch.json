@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         //////////////////////////////////////////////////   Python debug configuration ////////////////////////////////////////
         {
             "name": "Python: Current File",
@@ -97,8 +98,8 @@
         },
         //////////////////////////////////////////////////   CUDA-GDB debug configuration for reduce_sum ////////////////////////////////////////
         {
-            "name": "CUDA-GDB: reduce_sum",
-            "type": "cppdbg",
+            "name": "CUDA-GDB: redconfigurationuce_sum",
+            "type": "cuda-gdb",
             "request": "launch",
             "program": "/data/workspace/projects/ai_infra/downStreamProj/reduce_sum/outputs/app",
             "args": ["2", "64", "64", "64"],
@@ -112,7 +113,7 @@
             ],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/local/cuda-12.6/bin/cuda-gdb",
+            "miDebuggerPath": "/usr/local/cuda-12.4/bin/cuda-gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -120,6 +121,92 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "CUDA-GDB: sgemm",
+            "type": "cuda-gdb",
+            "request": "launch",
+            "program": "/data/workspace/projects/ai_infra/downStreamProj/sgemm/outputs/app",
+            // "program": "/data/workspace/projects/ai_infra/downStreamProj/sgemm/build/outputs/app",
+            "args": ["2", "64", "64", "64"],
+            "stopAtEntry": false,
+            "cwd": "/data/workspace/projects/ai_infra/downStreamProj/sgemm",
+            "environment": [
+                {
+                    "name": "CUDA_VISIBLE_DEVICES",
+                    "value": "0"
+                },
+                {
+                    "name": "CUDA_FORCE_PTX_JIT",
+                    "value": "0"
+                },
+                {
+                    "name": "CUDA_CACHE_DISABLE",
+                    "value": "1"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/local/cuda-12.4/bin/cuda-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        //////////////////////////////////////////////////   CUDA-GDB debug configuration for test_cuda_gdb ////////////////////////////////////////
+        {
+            "name": "CUDA-GDB(Naive)",
+            "type": "cuda-gdb",
+            "request": "launch",
+            "program": "/data/workspace/projects/ai_infra/test_cuda_gdb/build/cuda_debug_test",
+        },
+        {
+            "name": "CUDA-GDB: test_cuda_gdb (vectorAdd) - Console Mode",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/data/workspace/projects/ai_infra/test_cuda_gdb/build/cuda_debug_test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "/data/workspace/projects/ai_infra/test_cuda_gdb/build",
+            "environment": [
+                {
+                    "name": "CUDA_VISIBLE_DEVICES",
+                    "value": "0"
+                },
+                {
+                    "name": "CUDA_FORCE_PTX_JIT",
+                    "value": "0"
+                },
+                {
+                    "name": "CUDA_CACHE_DISABLE",
+                    "value": "1"
+                },
+                {
+                    "name": "CUDA_DEBUGGER_SOFTWARE_PREEMPTION",
+                    "value": "1"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/local/cuda-12.4/bin/cuda-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set breakpoint pending on",
+                    "text": "-gdb-set breakpoint pending on",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "engineLogging": false
+            }
         }
     ]
 }
